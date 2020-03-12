@@ -3,16 +3,16 @@ package com.eteshis.dto;
 
 public class TodoDTO {
     private Long id;
-    private String name;
-    private Long userId;
+    private String title;
+    private String description;
+    private Long parentTodoId;
 
-    public TodoDTO() {
+    public Long getParentTodoId() {
+        return parentTodoId;
     }
 
-    public TodoDTO(Long id, String name, Long userId) {
-        this.id = id;
-        this.name = name;
-        this.userId = userId;
+    public void setParentTodoId(Long parentTodoId) {
+        this.parentTodoId = parentTodoId;
     }
 
     public Long getId() {
@@ -23,19 +23,19 @@ public class TodoDTO {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public Long getUserId() {
-        return userId;
+    public String getDescription() {
+        return description;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(value = "/customer")
-public class CustomerController {
+@RequestMapping(value = "/users")
+public class UserController {
 
 
     @Autowired

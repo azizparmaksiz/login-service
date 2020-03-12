@@ -1,6 +1,8 @@
 package com.eteshis.domain;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -15,6 +17,17 @@ public class User {
 
     private String password;
 
+    @OneToMany(mappedBy = "user")
+    private List<Todo> todos  = new ArrayList<>();
+
+
+    public List<Todo> getTodos() {
+        return todos;
+    }
+
+    public void setTodos(List<Todo> todos) {
+        this.todos = todos;
+    }
 
     public String getName() {
         return name;

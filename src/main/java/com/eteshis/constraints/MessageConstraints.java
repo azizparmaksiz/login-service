@@ -21,4 +21,7 @@ public class MessageConstraints {
 
     public static final String BAD_SQL = "BAD_SQL";
     public static final String OLD_PASSWORD_NOT_MATCHED = "OLD_PASSWORD_NOT_MATCHED";
+    public static final String TODO_NOT_FOUND = "TODO_NOT_FOUND";
+    public static final String DEPENDENT_TODO_EXIST ="DEPENDENT_TODO_EXIST" ;
+    public static final String PARENT_TODO_NOT_FOUND = "PARENT_TODO_NOT_FOUND";
 }
