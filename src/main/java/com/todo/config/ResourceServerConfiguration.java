@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
@@ -79,8 +80,8 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 	
 	 @Override
      public void configure(HttpSecurity http) throws Exception {
-		 http.authorizeRequests().antMatchers("/", "/public/**", "/resources/**", "/resources/public/**").permitAll().and().csrf()
-				 // .requireCsrfProtectionMatcher(new AntPathRequestMatcher("/oauth/authorize"))
+		 http.authorizeRequests().antMatchers("/", "/public/**", "/resources/**", "/resources/public/**").permitAll().and()
+		 .csrf()
 				 .disable()
 				 .exceptionHandling()
 				 .authenticationEntryPoint(customAuthenticationEntryPoint)
@@ -98,14 +99,25 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 				 .frameOptions()
 				 .disable()
 				 .and()
-				 .authorizeRequests().anyRequest().permitAll()
-				 .antMatchers("/applicationSettings/**").authenticated()
+				 .authorizeRequests()
 				 .antMatchers("/oauth/token**").permitAll()
 				 .antMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 				 .antMatchers("/login**").authenticated()
 					 .antMatchers("/customer**").authenticated();
+//		 http
+//				 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//				 .and()
+//				 .antMatcher("/**")
+//				 .authorizeRequests()
+//				 .antMatchers("/oauth/token**").permitAll()
+//				 .antMatchers("/user/**").permitAll()
+//				 .antMatchers("/login/**").authenticated()
+//				 .antMatchers("/customer/**").authenticated()
+//				 .anyRequest().authenticated()
+//				 .and()
+//				 .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
 
 
-     }
+	 }
 	
 }
