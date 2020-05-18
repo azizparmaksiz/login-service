@@ -1,10 +1,5 @@
 package com.todo.service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.servlet.http.HttpServletRequest;
-
 import com.todo.constraints.MessageConstraints;
 import com.todo.domain.User;
 import com.todo.repository.UserRepository;
@@ -18,15 +13,17 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service("customerLoginUserDetailsService")
+import java.util.ArrayList;
+import java.util.Collection;
+
+@Service()
 public class CustomerLoginUserDetailsService implements UserDetailsService {
 	private final Logger log = LoggerFactory.getLogger(CustomerLoginUserDetailsService.class);
 
 	@Autowired
 	private UserRepository userRepository;
 
-	@Autowired
-	private HttpServletRequest request;
+
 
 
 	@Override

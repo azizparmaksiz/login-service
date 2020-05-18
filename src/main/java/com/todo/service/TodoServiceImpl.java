@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TodoServiceImpl implements TodoService {
@@ -30,6 +31,7 @@ public class TodoServiceImpl implements TodoService {
         this.todoRepository = todoRepository;
         this.userService = userService;
     }
+
     @Transactional
     @Override
     public void addTodo(TodoDTO todoDTO, User user) {
@@ -41,11 +43,11 @@ public class TodoServiceImpl implements TodoService {
         // TODO: burada aslinda parent todo benim todom mu kontrolu de yapilmali
         //  baskasinin todosunu kendime parent secemem lazim
         if (todoDTO.getParentTodoId() != null && todoDTO.getParentTodoId() != 0) {
-            Todo parent = todoRepository.findOne(todoDTO.getParentTodoId());
-            if (parent == null) {
+            Optional<Todo> parent = todoRepository.findById(todoDTO.getParentTodoId());
+            if (parent.isPresent()) {
                 throw new NotFoundException(MessageConstraints.PARENT_TODO_NOT_FOUND);
             }
-        todo.setParentTodoId(parent.getId());
+            todo.setParentTodoId(parent.get().getId());
         }
 
         todoRepository.save(todo);
@@ -59,18 +61,18 @@ public class TodoServiceImpl implements TodoService {
         Type listType = new TypeToken<List<TodoDTO>>() {
         }.getType();
 
-      return modelMapper.map(todoList, listType);
+        return modelMapper.map(todoList, listType);
     }
 
     @Transactional
     @Override
     public void deleteTodo(Long todoId, String username) {
-        Todo todo = todoRepository.findOne(todoId);
+        Optional<Todo> optionalTodo = todoRepository.findById(todoId);
 
-        if (todo == null) {
+        if (optionalTodo.isPresent()) {
             throw new NotFoundException(MessageConstraints.TODO_NOT_FOUND);
         }
-
+        Todo todo = optionalTodo.get();
         // check if todo belong to login user
         if (todo.getUser().getUsername() != username) {
             throw new IllegalOperationException(MessageConstraints.BAD_CREDENTIALS);
