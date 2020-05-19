@@ -27,8 +27,11 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 	@Value("${config.oauth2.publicKey}")
 	private String publicKey ;
 	
-	@Value("${authentication.oauth.tokenValidityInSeconds}")
+	@Value("${authentication.oauth.accessTokenValiditityInSeconds}")
 	private Integer PROP_TOKEN_VALIDITY_SECONDS;
+
+	@Value("${authentication.oauth.refreshTokenValidityInSeconds}")
+	private Integer REFRESH_PROP_TOKEN_VALIDITY_SECONDS;
 
 
 	@Autowired
@@ -63,7 +66,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 		defaultTokenServices.setSupportRefreshToken(true);
 		defaultTokenServices.setReuseRefreshToken(false);
 		defaultTokenServices.setAccessTokenValiditySeconds(this.PROP_TOKEN_VALIDITY_SECONDS);
-		defaultTokenServices.setRefreshTokenValiditySeconds(this.PROP_TOKEN_VALIDITY_SECONDS * 10);
+		defaultTokenServices.setRefreshTokenValiditySeconds(this.REFRESH_PROP_TOKEN_VALIDITY_SECONDS);
 		defaultTokenServices.setTokenEnhancer(tokenEnhancer());
 		return defaultTokenServices;
 	}

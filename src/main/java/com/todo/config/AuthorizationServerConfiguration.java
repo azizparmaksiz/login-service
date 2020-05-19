@@ -35,10 +35,10 @@ public  class AuthorizationServerConfiguration extends AuthorizationServerConfig
 	@Value("${authentication.oauth.secret:secret}")
 	private String clientSecret;
 
-	@Value("${authentication.oauth.accessTokenValidititySeconds:3600}") // 12 hours
+	@Value("${authentication.oauth.accessTokenValiditityInSeconds:3600}") // 12 hours
 	private int accessTokenValiditySeconds;
 
-	@Value("${authentication.oauth.refreshTokenValiditySeconds:36000}") // 30 days
+	@Value("${authentication.oauth.refreshTokenValidityInSeconds:36000}") // 30 days
 	private int refreshTokenValiditySeconds;
 
 @Autowired

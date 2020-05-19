@@ -11,7 +11,7 @@ import com.google.common.cache.CacheBuilder;
 @Component
 public class AppSettings{
 	
-	@Value("${authentication.oauth.tokenValidityInSeconds}")
+	@Value("${authentication.oauth.accessTokenValiditityInSeconds}")
 	private Integer PROP_TOKEN_VALIDITY_SECONDS;
 	
 	public  <K, V> Map<K, V> makeLoginAttempMap() {
