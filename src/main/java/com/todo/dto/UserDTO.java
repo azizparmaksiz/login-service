@@ -1,11 +1,22 @@
 package com.todo.dto;
 
+import com.todo.domain.RoleEnum;
+
 public class UserDTO {
     private Long id;
     private String username;
     private String name;
     private String surname;
     private String password;
+    private RoleEnum role;
+
+    public RoleEnum getRole() {
+        return role;
+    }
+
+    public void setRole(RoleEnum role) {
+        this.role = role;
+    }
 
     public Long getId() {
         return id;

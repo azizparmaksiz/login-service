@@ -1,6 +1,7 @@
 package com.todo.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,18 +22,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableResourceServer
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 
-	@Value("${config.oauth2.privateKey}")
-	private String privateKey ;
-
-	@Value("${config.oauth2.publicKey}")
-	private String publicKey ;
-	
-	@Value("${authentication.oauth.accessTokenValiditityInSeconds}")
-	private Integer PROP_TOKEN_VALIDITY_SECONDS;
-
-	@Value("${authentication.oauth.refreshTokenValidityInSeconds}")
-	private Integer REFRESH_PROP_TOKEN_VALIDITY_SECONDS;
-
+	@Autowired
+	@Qualifier("tokenServices")
+	public DefaultTokenServices tokenServices;
 
 	@Autowired
 	private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
@@ -43,42 +35,9 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 	private OAuthCorsFilter simpleCorsFilter;
 
 
-	@Bean("jwtAccessTokenConverter")
-	public JwtAccessTokenConverter jwtAccessTokenConverter() {
-		// log.info("Initializing JWT with public key:\n" + publicKey);
-		JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
-		converter.setSigningKey(privateKey);
-		converter.setVerifierKey(publicKey);
-
-		return converter;
-	}
-
-	@Bean("betexJWTTokenStore")
-	public JwtTokenStore tokenStore() {
-		return new JwtTokenStore(jwtAccessTokenConverter());
-	}
-
-	@Primary
-	@Bean("tokenServices")
-	public DefaultTokenServices tokenServices() {
-		DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
-		defaultTokenServices.setTokenStore(tokenStore());
-		defaultTokenServices.setSupportRefreshToken(true);
-		defaultTokenServices.setReuseRefreshToken(false);
-		defaultTokenServices.setAccessTokenValiditySeconds(this.PROP_TOKEN_VALIDITY_SECONDS);
-		defaultTokenServices.setRefreshTokenValiditySeconds(this.REFRESH_PROP_TOKEN_VALIDITY_SECONDS);
-		defaultTokenServices.setTokenEnhancer(tokenEnhancer());
-		return defaultTokenServices;
-	}
-
-	@Bean("customerTokenEnhancer")
-	public TokenEnhancer tokenEnhancer() {
-		return new CustomLoginTokenEnhancer();
-	}
-
 	@Override
 	public void configure(ResourceServerSecurityConfigurer config) {
-		config.tokenServices(tokenServices());
+		config.tokenServices(tokenServices);
 	}
 	
 	 @Override
@@ -107,19 +66,6 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 				 .antMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
 				 .antMatchers("/login**").authenticated()
 					 .antMatchers("/customer**").authenticated();
-//		 http
-//				 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//				 .and()
-//				 .antMatcher("/**")
-//				 .authorizeRequests()
-//				 .antMatchers("/oauth/token**").permitAll()
-//				 .antMatchers("/user/**").permitAll()
-//				 .antMatchers("/login/**").authenticated()
-//				 .antMatchers("/customer/**").authenticated()
-//				 .anyRequest().authenticated()
-//				 .and()
-//				 .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint);
-
 
 	 }
 	

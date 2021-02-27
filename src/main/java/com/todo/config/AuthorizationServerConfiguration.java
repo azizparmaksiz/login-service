@@ -1,13 +1,11 @@
 package com.todo.config;
 
-import java.util.Arrays;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.EnvironmentAware;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -22,17 +20,23 @@ import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
+import java.util.Arrays;
+
 
 @Configuration
 @EnableAuthorizationServer
 @EnableResourceServer
 // @Order(Ordered.HIGHEST_PRECEDENCE)
 public  class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter  {
+	@Value("${config.oauth2.privateKey}")
+	private String privateKey ;
 
-	@Value("${authentication.oauth.clientId:todo}")
+	@Value("${config.oauth2.publicKey}")
+	private String publicKey ;
+	@Value("${authentication.oauth.clientid}")
 	private String clientId;
 
-	@Value("${authentication.oauth.secret:secret}")
+	@Value("${authentication.oauth.secret}")
 	private String clientSecret;
 
 	@Value("${authentication.oauth.accessTokenValiditityInSeconds:3600}") // 12 hours
@@ -41,23 +45,9 @@ public  class AuthorizationServerConfiguration extends AuthorizationServerConfig
 	@Value("${authentication.oauth.refreshTokenValidityInSeconds:36000}") // 30 days
 	private int refreshTokenValiditySeconds;
 
-@Autowired
-public PasswordEncoder encoder;
+   @Autowired
+   public PasswordEncoder encoder;
 
-	@Autowired
-	public JwtAccessTokenConverter tokenEnhancer;
-
-	@Autowired
-	@Qualifier("betexJWTTokenStore")
-	public JwtTokenStore tokenStore;
-
-	@Autowired
-	@Qualifier("tokenServices")
-	public DefaultTokenServices tokenServices;
-
-	@Autowired
-	@Qualifier("jwtAccessTokenConverter")
-	public JwtAccessTokenConverter tokenConverter;
 
 	@Autowired
 	@Qualifier("authenticationManagerBean")
@@ -65,7 +55,41 @@ public PasswordEncoder encoder;
 
 	@Autowired
 	@Qualifier("customerTokenEnhancer")
-	private  TokenEnhancer customerTokenEnhancer;
+	private TokenEnhancer tokenEnhancer;
+
+
+	@Bean("jwtAccessTokenConverter")
+	public JwtAccessTokenConverter jwtAccessTokenConverter() {
+		// log.info("Initializing JWT with public key:\n" + publicKey);
+		JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
+		converter.setSigningKey(privateKey);
+		converter.setVerifierKey(publicKey);
+
+		return converter;
+	}
+
+	@Bean()
+	public JwtTokenStore tokenStore() {
+		return new JwtTokenStore(jwtAccessTokenConverter());
+	}
+
+	@Primary
+	@Bean("tokenServices")
+	public DefaultTokenServices tokenServices() {
+		DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
+		defaultTokenServices.setTokenStore(tokenStore());
+		defaultTokenServices.setSupportRefreshToken(true);
+		defaultTokenServices.setReuseRefreshToken(false);
+		defaultTokenServices.setAccessTokenValiditySeconds(this.accessTokenValiditySeconds);
+		defaultTokenServices.setRefreshTokenValiditySeconds(this.refreshTokenValiditySeconds);
+		defaultTokenServices.setTokenEnhancer(tokenEnhancer);
+		return defaultTokenServices;
+	}
+
+	@Bean("customerTokenEnhancer")
+	public TokenEnhancer customTokenEnhancer() {
+		return new CustomLoginTokenEnhancer();
+	}
 
 
 	@Override
@@ -76,8 +100,8 @@ public PasswordEncoder encoder;
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
 		TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
-		tokenEnhancerChain.setTokenEnhancers(Arrays.asList(customerTokenEnhancer, tokenEnhancer, tokenConverter));
-		endpoints.tokenStore(tokenStore).tokenEnhancer(tokenEnhancerChain).authenticationManager(authenticationManager);
+		tokenEnhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer,  jwtAccessTokenConverter()));
+		endpoints.tokenStore(tokenStore()).tokenEnhancer(tokenEnhancerChain).authenticationManager(authenticationManager);
 	}
 
 	@Override
@@ -93,8 +117,6 @@ public PasswordEncoder encoder;
 				.accessTokenValiditySeconds(accessTokenValiditySeconds)
 				.refreshTokenValiditySeconds(refreshTokenValiditySeconds);
 	}
-
-
 
 }
 

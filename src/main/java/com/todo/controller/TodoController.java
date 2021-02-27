@@ -6,6 +6,7 @@ import com.todo.service.TodoService;
 import com.todo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class TodoController {
     }
 
     @GetMapping(value = "/all")
+    @PreAuthorize("hasAuthority(T(com.todo.domain.RoleEnum).ADMIN)")
     public List<TodoDTO> getTodos() {
 
         User user=  userService.getLoginUser();
@@ -37,6 +39,7 @@ public class TodoController {
     }
 
     @DeleteMapping(value = "/delete/{id}")
+    @PreAuthorize("hasAuthority(T(com.todo.domain.RoleEnum).GUEST)")
     public void deletTodo(@PathVariable("id") Long id) {
 
         User user=  userService.getLoginUser();

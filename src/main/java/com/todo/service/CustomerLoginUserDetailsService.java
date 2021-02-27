@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Service()
 public class CustomerLoginUserDetailsService implements UserDetailsService {
@@ -41,10 +43,7 @@ public class CustomerLoginUserDetailsService implements UserDetailsService {
 		}
 
 		Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
-//		List<String> roles = loginRepository.getRoles(customer.getCustomerId());
-//		for (String role : roles) {
-//			grantedAuthorities.add(new SimpleGrantedAuthority(role));
-//		}
+			grantedAuthorities.add(new SimpleGrantedAuthority(user.getRole()!=null?user.getRole().name():null));
 
 
 		return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), grantedAuthorities);
